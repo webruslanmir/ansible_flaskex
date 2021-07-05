@@ -66,6 +66,15 @@
       mode: 0644
       force: yes
       
+  - name: Copy wsgi.py
+    copy:
+      src: files/wsgi.py
+      dest: /home/flaskex
+      owner: flaskex
+      group: www-data
+      mode: 0644
+      force: yes
+      
   - name: Copy config files for WSGI ini
     copy:
       src: files/flaskapp.ini
