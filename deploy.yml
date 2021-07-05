@@ -73,12 +73,14 @@
       owner: flaskex
       group: www-data
       mode: 0644
+      force: yes
       
   - name: Copy config files for socket config
     copy:
       src: files/flaskapp.service
       dest: /etc/systemd/system/
       mode: 0644
+      force: yes
       
       
   - name: Chown -R flaskex:www-data /home/flaskex
