@@ -18,6 +18,12 @@
     apt:
       name: python3-pip
       state: present
+      
+  #  Install NGINX
+  - name: Install python packages
+    apt:
+      name: nginx
+      state: present
 
   #  Git clone from github
   - name: Git clone repositories
