@@ -1,0 +1,98 @@
+---
+- name: Run flaskex app
+  hosts: devs
+  become: yes
+
+
+  tasks:
+  
+  #  Update installed repositories
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day
+
+  #  Install python packages
+  - name: Install python packages
+    apt:
+      name: python3-pip
+      state: present
+
+  #  Git clone from github
+  - name: Git clone repositories
+    git:
+      repo: https://github.com/anfederico/flaskex.git
+      dest: "/home/flaskex"
+      update: yes
+      version: master
+  
+  #  Install python requirements
+  - name: Install specified python requirements offline from a local directory with downloaded packages
+    pip:
+      requirements: /home/flaskex/requirements.txt
+      executable: pip3
+      
+  # Service for FLASK web server prod    
+  - name: Install uWSGI
+    pip:
+      name: uwsgi
+      executable: pip3
+
+
+  #  Create user for flask app
+  - name: Create user
+    user:
+      name: flaskex
+      groups:
+      - www-data
+      state: present
+      shell: /bin/bash     
+      system: no          
+      createhome: no       
+      home: /home/flaskex
+
+  #  Copy config files
+  - name: Copy config files for NGINX site available
+    copy:
+      src: files/default
+      dest: /etc/nginx/sites-available/default
+      mode: 0644
+      force: yes
+      
+  - name: Copy config files for WSGI ini
+    copy:
+      src: files/flaskapp.ini
+      dest: /home/flaskex
+      owner: flaskex
+      group: www-data
+      mode: 0644
+      
+  - name: Copy config files for socket config
+    copy:
+      src: files/flaskapp.service
+      dest: /etc/systemd/system/
+      mode: 0644
+      
+      
+  - name: Chown -R flaskex:www-data /home/flaskex
+    file:
+      dest: /home/flaskex
+      owner: flaskex
+      group: www-data
+      recurse: yes
+      
+  - name: Start flaskapp
+    systemd:
+      name: flaskapp
+      state: started
+      enabled: yes
+      
+  - name: Reload nginx service
+    systemd:
+      name: nginx
+      daemon_reload: yes
+      state: reloaded
+
+...
+

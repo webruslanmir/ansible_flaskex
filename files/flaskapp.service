@@ -1,0 +1,15 @@
+### /etc/systemd/system/
+
+[Unit]
+Description=uWSGI instance
+After=network.target
+
+[Service]
+User=flaskex
+Group=www-data
+WorkingDirectory=/home/flaskex
+Environment="PATH=/home/flaskex/venv/bin"
+ExecStart=/home/flaskex/venv/bin/uwsgi --ini flaskapp.ini
+
+[Install]
+WantedBy=multi-user.target
