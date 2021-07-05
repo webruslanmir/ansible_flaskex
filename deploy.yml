@@ -13,14 +13,26 @@
       update_cache: yes
       cache_valid_time: 86400 #One day
 
-  #  Install python packages
-  - name: Install python packages
+  #  Install python 3.6
+  - name: Install python 3.6
+    apt:
+      name: python3.6
+      state: present
+
+  #  Install python pip
+  - name: Install python3-pip
     apt:
       name: python3-pip
       state: present
       
+  #  Install python venv
+  - name: Install python3-venv
+    apt:
+      name: python3-venv
+      state: present
+      
   #  Install NGINX
-  - name: Install python packages
+  - name: Install nginx
     apt:
       name: nginx
       state: present
@@ -32,18 +44,24 @@
       dest: "/home/flaskex"
       update: yes
       version: master
+      
+      
+  - name: Install virtual env 
+    shell: "python3 -m venv /home/flaskex/venv"
   
   #  Install python requirements
   - name: Install specified python requirements offline from a local directory with downloaded packages
     pip:
       requirements: /home/flaskex/requirements.txt
-      executable: pip3
+      virtualenv: /home/flaskex/venv
+      virtualenv_python: python3.6
       
   # Service for FLASK web server prod    
   - name: Install uWSGI
     pip:
       name: uwsgi
-      executable: pip3
+      virtualenv: /home/flaskex/venv
+      virtualenv_python: python3.6
 
 
   #  Create user for flask app
